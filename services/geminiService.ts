@@ -1,8 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Character } from '../types';
 
-// Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize Gemini Client Lazily
+// This prevents the app from crashing on load if process.env is accessed too early in some environments
+let ai: GoogleGenAI | null = null;
+
+const getAiClient = () => {
+  if (!ai) {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  }
+  return ai;
+};
 
 // System instruction for the text generation model
 const SYSTEM_INSTRUCTION = `
@@ -14,7 +22,7 @@ const SYSTEM_INSTRUCTION = `
 
 export const generateCharacterProfile = async (userPrompt: string): Promise<Omit<Character, 'id' | 'createdAt'>> => {
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAiClient().models.generateContent({
       model: "gemini-3-flash-preview",
       contents: userPrompt,
       config: {
@@ -69,7 +77,7 @@ export const generateCharacterImage = async (visualPrompt: string): Promise<stri
     // Adding stylistic enhancements to the prompt
     const enhancedPrompt = `${visualPrompt}, character concept art, high quality, 4k, digital painting, detailed lighting, centered composition`;
     
-    const response = await ai.models.generateContent({
+    const response = await getAiClient().models.generateContent({
       model: "gemini-2.5-flash-image",
       contents: {
         parts: [{ text: enhancedPrompt }]
