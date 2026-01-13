@@ -1,0 +1,5 @@
+{
+  "name": "PersonaAI - 캐릭터 생성기",
+  "description": "Google Gemini를 활용하여 독창적인 캐릭터 설정과 일러스트를 생성하는 캐릭터 소개 사이트입니다.",
+  "requestFramePermissions": []
+}
